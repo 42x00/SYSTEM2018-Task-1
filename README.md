@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # <center>Project 1: Fantasy Ptrace </center>
 ## 概述
 ptrace是process和trace的简写，直译为进程跟踪。它提供了一种使父进程得以监视和控制其子进程的方式，它还能够改变子进程中的寄存器和内核映像，因而可以实现系统调用的跟踪和断点调试。
@@ -333,3 +334,7 @@ Tel: 17621782336
 QQ: 137645534
 
 email: 137645534@qq.com / lijinning@sjtu.edu.cn
+=======
+# SYSTEM2018-Task-1
+system 2018 tasks for students in ACM class 2016
+>>>>>>> a3cf61336aad8786766f4d1d4b668ee03c7498b1
