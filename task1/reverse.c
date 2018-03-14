@@ -13,13 +13,12 @@ const int long_size = sizeof(long);//字长 若本机是64位，则字长应为8
 * TODO 反转str指针指向的字符串
 **/
 void reverse(char *str){
-  int len = 0;
+  int len = strlen(str);
   char tmp;
-  for (char *p = str; (*p) != '\0'; ++p, ++len);
-  for (int i = 0; i <= len / 2; ++i){
-      tmp = *(str + i);
-      *(str + i) = *(str + len + 1 - i);
-      *(str + len - 1 - i) = tmp;
+  for (int i = 1; i <= len / 2; ++i){
+      tmp = *(str - 1 + i);
+      *(str - 1 + i) = *(str + len - i);
+      *(str + len - i) = tmp;
   }
 }
 
@@ -30,13 +29,16 @@ void reverse(char *str){
 * 你可能会用到：memcpy函数
 **/
 void getdata(pid_t child, long addr, char *str, int len){
+    long data;
     while (len >= 8){
-        memcpy(str, ptrace(PTRACE_PEEKDATA,child,addr,NULL), 8);
+        data = ptrace(PTRACE_PEEKDATA,child,addr,NULL);
+        memcpy(str, &data, 8);
         str += 8;
         addr += 8;
         len -= 8;
     }
-    memcpy(str,ptrace(PTRACE_PEEKDATA,child,addr,NULL),len);
+    data = ptrace(PTRACE_PEEKDATA,child,addr,NULL);
+    memcpy(str, &data, len);
     str += len;
     *str = '\0';
 }
@@ -46,12 +48,16 @@ void getdata(pid_t child, long addr, char *str, int len){
  * 使用 ptrace 的 PTRACE_POKEDATA 来写，需要注意的是由于64位机器的字长是8byte。
  * */
 void putdata(pid_t child, long addr, char *str, int len){
-    while (len > 0){
-        ptrace(PTRACE_POKEDATA, child, addr, *((double*)str));
+    long data;
+    while (len >= 8){
+        memcpy(&data, str, 8);
+        ptrace(PTRACE_POKEDATA, child, addr, data);
         str += 8;
         addr += 8;
         len -= 8;
     }
+    memcpy(&data, str, len);
+    ptrace(PTRACE_POKEDATA, child, addr, data);
 }
 
 int main(){
