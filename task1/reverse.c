@@ -16,10 +16,10 @@ void reverse(char *str){
   int len = 0;
   char tmp;
   for (char *p = str; (*p) != '\0'; ++p, ++len);
-  for (int i = 1; i <= len / 2; ++i){
-    tmp = *(str + i);
-    *(str + i) = *(str + len + 1 - i);
-    *(str + len + 1 - i) = tmp;
+  for (int i = 0; i <= len / 2; ++i){
+      tmp = *(str + i);
+      *(str + i) = *(str + len + 1 - i);
+      *(str + len - 1 - i) = tmp;
   }
 }
 
@@ -30,6 +30,15 @@ void reverse(char *str){
 * 你可能会用到：memcpy函数
 **/
 void getdata(pid_t child, long addr, char *str, int len){
+    while (len >= 8){
+        memcpy(str, ptrace(PTRACE_PEEKDATA,child,addr,NULL), 8);
+        str += 8;
+        addr += 8;
+        len -= 8;
+    }
+    memcpy(str,ptrace(PTRACE_PEEKDATA,child,addr,NULL),len);
+    str += len;
+    *str = '\0';
 }
 
 /**
@@ -37,7 +46,12 @@ void getdata(pid_t child, long addr, char *str, int len){
  * 使用 ptrace 的 PTRACE_POKEDATA 来写，需要注意的是由于64位机器的字长是8byte。
  * */
 void putdata(pid_t child, long addr, char *str, int len){
-
+    while (len > 0){
+        ptrace(PTRACE_POKEDATA, child, addr, *((double*)str));
+        str += 8;
+        addr += 8;
+        len -= 8;
+    }
 }
 
 int main(){
@@ -72,6 +86,10 @@ int main(){
           * 需要注意的是，RAX的宏定义是 ORIG_RAX，
           * 而 RDI RSI RDX 的宏定义为 RDI RSI RDX
           **/
+          params[0] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RDI, NULL);
+          params[1] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RSI, NULL);
+          params[2] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RDX, NULL);
+
           str = (char *)calloc((params[2]+1), sizeof(char));
           getdata(child, params[1], str,
                   params[2]);
@@ -85,6 +103,7 @@ int main(){
     /**
     * TODO 使用 PTRACE_SYSCALL 来让子进程进行系统调用。
     **/
+    ptrace(PTRACE_SYSCALL, child, 0, NULL);
     }
   }
   return 0;
