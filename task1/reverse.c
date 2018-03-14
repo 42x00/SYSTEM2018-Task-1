@@ -13,6 +13,14 @@ const int long_size = sizeof(long);//字长 若本机是64位，则字长应为8
 * TODO 反转str指针指向的字符串
 **/
 void reverse(char *str){
+  int len = 0;
+  char tmp;
+  for (char *p = str; (*p) != '\0'; ++p, ++len);
+  for (int i = 1; i <= len / 2; ++i){
+    tmp = *(str + i);
+    *(str + i) = *(str + len + 1 - i);
+    *(str + len + 1 - i) = tmp;
+  }
 }
 
 /**
