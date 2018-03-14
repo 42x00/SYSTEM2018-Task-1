@@ -86,9 +86,9 @@ int main(){
           * 需要注意的是，RAX的宏定义是 ORIG_RAX，
           * 而 RDI RSI RDX 的宏定义为 RDI RSI RDX
           **/
-          params[0] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RDI, NULL);
-          params[1] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RSI, NULL);
-          params[2] = ptrace(PTRACE_PEEKUSER, child, 8 * ORIG_RDX, NULL);
+          params[0] = ptrace(PTRACE_PEEKUSER, child, 8 * RDI, NULL);
+          params[1] = ptrace(PTRACE_PEEKUSER, child, 8 * RSI, NULL);
+          params[2] = ptrace(PTRACE_PEEKUSER, child, 8 * RDX, NULL);
 
           str = (char *)calloc((params[2]+1), sizeof(char));
           getdata(child, params[1], str,
